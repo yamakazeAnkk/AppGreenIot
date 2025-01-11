@@ -17,49 +17,43 @@ export const settings = [
         icon: AntDesign,
         iconName: 'phone',
     },
-    
     {
         title: 'Security',
         icon: MaterialIcons,
         iconName: 'security',
     },
-    {
-        title: 'Logout',
-        icon: MaterialIcons,
-        iconName: 'logout',
-    },
+   
 ]
 export const sensor = [
     {
         title: 'Temperature',
         icon: icons.temperature,
+        slug: 'temperature',
     },
     {
         title: 'Humidity',
         icon: icons.sun,
+        slug: 'humidity',
     },
     {
         title: 'Water',
         icon: icons.water,
+        slug: 'water',
     },
     {
         title: 'Wind',
         icon: icons.wind,
+        slug: 'wind',
     },
     {
         title: 'Light',
         icon: icons.light,
+        slug: 'light',
     },
     {
         title: 'Leaf',
         icon: icons.leaf,
+        slug: 'leaf',
     },
-    {
-        title: 'Leaf',
-        icon: icons.leaf,
-    },  
-    {
-        title: 'Leaf',
-        icon: icons.leaf,
-    },
+    
 ]

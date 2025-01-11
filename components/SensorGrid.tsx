@@ -14,7 +14,7 @@ export default function SensorGrid() {
         <View className='flex-row flex-wrap justify-between pt-4'>
             {sensor.map((item, index) => (
                 <View key={index} className='w-[48%] mb-4 border-none rounded-3xl'>
-                    <SensorCard icon={item.icon} title={item.title} />
+                    <SensorCard icon={item.icon} title={item.title} slug={item.slug}/>
                 </View>
             ))}
         </View>

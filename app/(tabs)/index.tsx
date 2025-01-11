@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, Button } from 'react-native'
 import React from 'react'
 
 import Search from '@/components/Search'
@@ -18,10 +18,16 @@ const index = () => {
           </View>
         </View>
         <Weather city='Ho Chi Minh City' className='mt-5' />
+        
         <Search />
-        <View className='flex-1 pt-5' style={{ marginBottom: tabBarHeight * 0.5}}>
+        <View className='flex flex-row items-center px-5 mt-5 justify-between'>
+          <Text className='text-xl font-rubik-medium text-black-300'>Location</Text>
+          <Button title='Add' />
+        </View>
+        
+        
+        <View className='flex-1' style={{ marginBottom: tabBarHeight * 0.5}}>
           <SensorGrid />
-
         </View>
       </View>
     </SafeAreaView> 
