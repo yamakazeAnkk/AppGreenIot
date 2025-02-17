@@ -15,10 +15,19 @@ export default function Login() {
             alert('Please enter email and password!');
             return;
         }
+        
 
         setIsLoading(true);
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const currentUser = await signInWithEmailAndPassword(auth, email, password);
+            const user = currentUser.user;
+            
+
+            const idToken = await user.getIdToken();
+
+            console.log(idToken);
+        // In token ra console
+            console.log('Firebase ID Token:', idToken);
             router.replace('/(tabs)');
         } catch (error) {
             alert('Login failed: ' + error);

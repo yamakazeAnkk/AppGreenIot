@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { Ionicons, MaterialIcons, FontAwesome5, Entypo } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons, FontAwesome5, Entypo, MaterialCommunityIcons } from '@expo/vector-icons'
 
 const icons = {
     home: <Ionicons name="home-outline" size={24} color="black" />,
@@ -16,6 +16,12 @@ const icons = {
     air: <Entypo name="air" size={24} color="black" />,
     leaf: <Entypo name="leaf" size={24} color="black" />,
     cloud: <FontAwesome5 name="cloud-sun" size={24} color="red" />,
+    fan: <FontAwesome5 name="fan" size={50} color="black" />,
+    waterPump: <MaterialCommunityIcons name="water-pump" size={50} color="black" />,
+    homeRoof: <MaterialCommunityIcons name="home-roof" size={50} color="black" />,
+    settingsSuggest: <MaterialIcons name="settings-suggest" size={50} color="black" />,
+
+
 
   };
 

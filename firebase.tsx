@@ -1,4 +1,5 @@
 import {initializeApp} from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import {
     initializeAuth,
     // @ts-ignore
@@ -25,5 +26,5 @@ const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
-
-export {auth};
+const database = getDatabase(app);
+export {auth, database};

@@ -25,6 +25,9 @@ export default function profile() {
         await signOut(auth)
         router.replace('/(auth)/login') 
     }
+    const handleEditProfile = () => {
+        router.push('/page/edit')
+    }
     const Settings = ({icon: Icon ,iconName, title , onPress , textStyle, showArrow = true } : SettingsItemProps) => (
         <TouchableOpacity onPress={onPress} className={`flex flex-row items-center justify-between gap-3 mt-10 ${textStyle}`}>
             <View className='flex flex-row items-center gap-3'>
@@ -57,7 +60,15 @@ export default function profile() {
                
                 <View className="flex flex-col">
                     {settings.map((item, index) => (
-                        <Settings key={index} icon={item.icon} iconName={item.iconName} title={item.title} onPress={() => {}} textStyle='text-2xl font-bold' showArrow={true} />
+                        <Settings 
+                            key={index} 
+                            icon={item.icon} 
+                            iconName={item.iconName} 
+                            title={item.title} 
+                            onPress={item.title === 'Edit Profile' ? handleEditProfile : () => {}} 
+                            textStyle='text-2xl font-bold' 
+                            showArrow={true} 
+                        />
                     ))}
                 </View>
                 <View>

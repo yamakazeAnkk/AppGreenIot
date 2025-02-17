@@ -5,7 +5,7 @@ import Search from '@/components/Search'
 import { Weather } from '@/components/WeatherCard'
 import SensorGrid from '@/components/SensorGrid'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-
+import LocationGird from '@/components/LocationGird'
 const index = () => {
   const tabBarHeight = useBottomTabBarHeight();
   return (
@@ -27,7 +27,8 @@ const index = () => {
         
         
         <View className='flex-1' style={{ marginBottom: tabBarHeight * 0.5}}>
-          <SensorGrid />
+          {/* <SensorGrid /> */}
+          <LocationGird />
         </View>
       </View>
     </SafeAreaView> 

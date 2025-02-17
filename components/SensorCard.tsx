@@ -4,28 +4,47 @@ import { sensor } from '@/data/data'
 import { useRouter } from 'expo-router'
 
 
+
 type SensorCardProps = {
     icon : React.ReactNode
     title : string
     slug : string
+    value : string | number 
+    id : string
 }
-export default function SensorCard({icon , title, slug}: SensorCardProps) {
+export default function SensorCard({icon , title, slug, value, id}: SensorCardProps) {
   const router = useRouter();
   const handlePress = () => {
-    router.push(`/page/${slug}`);
+    router.push(`/page/grow/growSlug/${slug}?chart=${encodeURIComponent(slug)}&id=${id}`);
   }
   return (
     <TouchableOpacity 
         onPress={handlePress}
-        className='flex-1 bg-white relative aspect-square border-none rounded-3xl'
+        style={{
+          flex: 1,
+          backgroundColor: 'white',
+          borderRadius: 20,  // Rounded corners
+          aspectRatio: 1,  // Maintain square shape
+          padding: 16,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderWidth: 2,  // Add border width
+          borderColor: '#4A6741',  // Green border color
+          shadowColor: '#000',  // Optional: adds shadow for iOS
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 5,  // Optional: adds shadow for Android
+        }}
     >
-        <View className="flex-1 justify-center items-center">
-            <View className="mb-4">
-                {icon}
-            </View>
-            <Text className="text-2xl font-semibold text-gray-800 mb-1">
-                {title}
-            </Text>
+      <View className='absolute inset-0 flex justify-center items-center'>
+        <Text className="text-2xl font-bold">{String(value)}</Text>
+      </View>
+      <View className='absolute bottom-2 right-2 items-end'>
+        <View>
+          {typeof icon === 'string' ? <Text>{icon}</Text> : icon}
+        </View>
+        <Text className='text-2xl font-semibold text-gray-800'>{title}</Text>
       </View>
     </TouchableOpacity>
   )
