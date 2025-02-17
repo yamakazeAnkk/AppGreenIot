@@ -1,51 +1,62 @@
-# Welcome to your Expo app 👋
+# Hướng Dẫn Chạy Dự Án React Native Expo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Giới Thiệu
+Dự án này được xây dựng với **React Native** và **Expo**. Đây là một hướng dẫn chi tiết để bạn có thể cài đặt và chạy dự án trên máy tính của mình.
 
-## Get started
+---
 
-1. Install dependencies
+## Yêu Cầu Hệ Thống
+Trước khi bắt đầu, hãy đảm bảo rằng bạn đã cài đặt các công cụ sau:
 
+1. **Node.js**: Cài đặt Node.js từ [https://nodejs.org/](https://nodejs.org/).
+   - Đảm bảo sử dụng **Node 14.x** hoặc phiên bản mới hơn.
+   
+2. **Expo CLI**: Cài đặt Expo CLI toàn cục bằng cách chạy lệnh sau:
    ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+   npm install -g expo-cli
+## Cài Đặt Dự Án
+### 1. Clone Dự Án
 ```bash
-npm run reset-project
+https://github.com/yamakazeAnkk/AppGreenIot.git
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Cài Đặt Phụ Thuộc
+Cài đặt tất cả các phụ thuộc cần thiết cho dự án:
+```bash
+npm install
+```
+### 4. Chạy Dự Án
+```bash
+expo start
+```
+## Cấu trúc dự án
+```Plain Text
+greeniot/
+├── assets/            # Thư mục chứa tài nguyên như hình ảnh, font, v.v.
+├── components/        # Các component dùng chung trong ứng dụng
+├── screens/           # Các màn hình của ứng dụng
+├── navigation/        # Cấu hình và các component điều hướng
+├── constants/          # Các hằng số, cấu hình tĩnh
+├── services/           # Các lớp dịch vụ (API, Firebase, v.v.)
+├── App.js             # Điểm khởi đầu của ứng dụng
+└── app.json            # Các cấu hình cho Expo
+```
+Lỗi Thường Gặp và Cách Khắc Phục
+Lỗi npm install không thành công:
 
-## Learn more
+Thử xóa node_modules và cài đặt lại:
+rm -rf node_modules
+npm install
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+rm -rf node_modules
+npm install
+```
+Không thể chạy trên thiết bị Android:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Đảm bảo đã cài đặt Android Studio và trình giả lập Android.
+Nếu vẫn không chạy được, thử chạy lại trình giả lập hoặc khởi động lại Expo CLI.
+Lỗi khi kết nối với thiết bị iOS:
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# AppGreenIot
+Đảm bảo rằng bạn đã cài đặt Xcode và Simulator.
+Kiểm tra lại kết nối giữa Expo CLI và iOS Simulator.
