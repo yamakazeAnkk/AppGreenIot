@@ -11,13 +11,9 @@ import {
   Keyboard,
 } from "react-native";
 import React, { useState } from "react";
-import { isLoading, useFonts } from "expo-font";
-import { router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { auth } from "../../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -25,6 +21,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
       alert("Please enter email and password!");
@@ -37,11 +34,33 @@ export default function Register() {
 
     setIsLoading(true);
     try {
-      // Xử lý đăng ký
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.replace("/(tabs)");
-    } catch (error) {
-      alert("Đăng ký thất bại: " + error);
+      // Xử lý đăng ký Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Gửi dữ liệu người dùng vào API
+      const response = await fetch('http://localhost:8080/api/User', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: user.uid, // Lấy user ID từ Firebase
+          name: email, // Lấy tên từ email
+          dateOfBirth: "", // Cung cấp ngày sinh nếu cần
+          phone: "", // Cung cấp số điện thoại nếu cần
+          image: "https://firebasestorage.googleapis.com/v0/b/bookstore-59884.appspot.com/o/images%2F1741158783923-photo.jpg?alt=media&token=72becb90-a582-4325-90ba-b48f64c3b0f8", // Ảnh mặc định
+          role: "user", // Cung cấp role (có thể thay đổi)
+        }),
+      });
+
+      if (response.ok) {
+        router.replace("/(tabs)"); // Điều hướng đến trang chính sau khi đăng ký thành công
+      } else {
+        alert("Đã xảy ra lỗi khi gửi thông tin người dùng!");
+      }
+    } catch (error: any) {
+      alert("Đăng ký thất bại: " + error.message);
     } finally {
       setIsLoading(false);
     }

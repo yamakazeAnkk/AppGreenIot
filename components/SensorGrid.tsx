@@ -7,12 +7,20 @@ import { sensor } from '@/data/data';
 interface SensorData {
   CoPpm: string;
   Humidity: string;
-  IsRaining: string;
   LightLevel: string;
   SoilMoisture: string;
   Temperature: string;
+  IsRaining: string;
 }
 const INTERVAL_TIME = 600000;
+const units = {
+  CoPpm: 'ppm',
+  Humidity: '%',
+  IsRaining: '',
+  LightLevel: 'lux',
+  SoilMoisture: '%',
+  Temperature: '°C',
+}
 export default function SensorGrid() {
   const route = useRoute();
   
@@ -52,10 +60,10 @@ export default function SensorGrid() {
         const mappedData: SensorData = {
           CoPpm: data.coPpm,
           Humidity: data.humidity,
-          IsRaining: data.isRaining === 1 ? 'Yes' : 'No',
           LightLevel: data.lightLevel,
           SoilMoisture: data.soilMoisture,
           Temperature: data.temperature,
+          IsRaining: data.isRaining === 1 ? 'Yes' : 'No',
         };
         setSensorData(mappedData);
       } catch (error) {
@@ -101,6 +109,7 @@ export default function SensorGrid() {
               slug={item.slug}
               value={sensorData ? sensorData[item.key as keyof typeof sensorData] : ''}
               id={id}
+              unit={units[item.key as keyof typeof units]}
             />
           </View>
         ))}

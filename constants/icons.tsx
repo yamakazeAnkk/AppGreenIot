@@ -21,6 +21,7 @@ const icons = {
     homeRoof: <MaterialCommunityIcons name="home-roof" size={50} color="black" />,
     settingsSuggest: <MaterialIcons name="settings-suggest" size={50} color="black" />,
 
+    landscape: <MaterialIcons name="landscape" size={24} color="red" />,
 
 
   };

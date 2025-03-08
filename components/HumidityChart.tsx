@@ -1,54 +1,166 @@
-import React, { useState } from 'react';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
-import { ProgressChart } from 'react-native-chart-kit';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { LineChart } from 'react-native-chart-kit';
+import { Feather } from '@expo/vector-icons';
 
-interface HumidityProgressChartProps {
+interface HumidityChartProps {
   id: string;
   chart: string;
 }
-export default function HumidityProgressChart({id, chart}: HumidityProgressChartProps) {
-  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
+
+export default function HumidityChart({ id, chart }: HumidityChartProps) {
+  const [viewMode, setViewMode] = useState<'day' | 'month' | 'week'>('day');
+  const [dayData, setDayData] = useState<any>(null);
+  const [weekData, setWeekData] = useState<any>(null);
+  const [monthlyData, setMonthlyData] = useState<any>(null);
   const screenWidth = Dimensions.get('window').width;
+  const [selectedDate, setSelectedDate] = useState('2025-02-01');
 
-  // Dữ liệu cho chế độ Day (7 ngày trong tuần)
-  const dayData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    data: [0.6, 0.65, 0.7, 0.68, 0.72, 0.75, 0.69],
-  };
+  useEffect(() => {
+    if (viewMode === 'day') {
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/time/${id}?year=${year}&month=${month}&day=${day}&columnName=Humidity`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Day Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setDayData({
+              labels: ["00-03", "03-06", "06-09", "09-12", "12-15", "15-18", "18-21", "21-24"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "day" mode:', data);
+            setDayData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching day data:', error);
+          setDayData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
 
-  // Dữ liệu cho chế độ Week (4 tuần, giá trị tổng hợp)
-  const weekData = {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
-    data: [0.70, 0.68, 0.72, 0.74],
-  };
+  useEffect(() => {
+    if (viewMode === 'month') {
+      const [year, month] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/monthlyAverage/${id}?year=${year}&month=${month}&week=1&columnName=Humidity`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Month Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setMonthlyData({
+              labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "month" mode:', data);
+            setMonthlyData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching month data:', error);
+          setMonthlyData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
 
-  const currentData = viewMode === 'day' ? dayData : weekData;
+  useEffect(() => {
+    if (viewMode === 'week') {
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/weeklyAverage/${id}?year=${year}&month=${month}&day=${day}&columnName=Humidity`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Week Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setWeekData({
+              labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "week" mode:', data);
+            setWeekData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching week data:', error);
+          setWeekData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
 
-  // Chart config cố định với một màu duy nhất
+  const currentData = viewMode === 'day' ? dayData : viewMode === 'month' ? monthlyData : weekData;
+
   const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    decimalPlaces: 2,
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    decimalPlaces: 0,
     color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: { borderRadius: 16 },
+    propsForDots: {
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#0000FF',
+    },
   };
 
-  return (
-    <View style={{ padding: 16 }}>
-      {/* Tiêu đề */}
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-        Humidity Progress Chart ({viewMode === 'day' ? 'Day View' : 'Week View'})
-      </Text>
+  if (!currentData) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
-      {/* Toggle Button giữa Day và Week */}
+  return (
+    <SafeAreaView style={{ flex: 1, padding: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            backgroundColor: '#E0F7FA',
+            borderRadius: 16,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 8,
+          }}
+        >
+          <Feather name="droplet" size={20} color="#0000FF" />
+        </View>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Humidity Chart</Text>
+      </View>
+
+      <Calendar
+        current={selectedDate}
+        onDayPress={(day: any) => {
+          console.log('Selected day', day.dateString);
+          setSelectedDate(day.dateString);
+        }}
+        markedDates={{
+          [selectedDate]: {
+            selected: true,
+            selectedColor: '#0000FF',
+          },
+        }}
+        style={{ marginBottom: 16 }}
+      />
+
       <View style={{ flexDirection: 'row', marginBottom: 16 }}>
         <TouchableOpacity
           onPress={() => setViewMode('day')}
           style={{
             paddingVertical: 8,
             paddingHorizontal: 16,
-            backgroundColor: viewMode === 'day' ? "#007AFF" : "#ccc",
+            backgroundColor: viewMode === 'day' ? "#0000FF" : "#ccc",
             borderRadius: 8,
             marginRight: 8,
           }}
@@ -56,11 +168,23 @@ export default function HumidityProgressChart({id, chart}: HumidityProgressChart
           <Text style={{ color: 'white', fontSize: 16 }}>Day</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => setViewMode('month')}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            backgroundColor: viewMode === 'month' ? "#0000FF" : "#ccc",
+            borderRadius: 8,
+            marginRight: 8,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 16 }}>Month</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => setViewMode('week')}
           style={{
             paddingVertical: 8,
             paddingHorizontal: 16,
-            backgroundColor: viewMode === 'week' ? "#007AFF" : "#ccc",
+            backgroundColor: viewMode === 'week' ? "#0000FF" : "#ccc",
             borderRadius: 8,
           }}
         >
@@ -68,18 +192,20 @@ export default function HumidityProgressChart({id, chart}: HumidityProgressChart
         </TouchableOpacity>
       </View>
 
-      {/* Bọc ProgressChart trong một View căn giữa */}
-      <View style={{ alignItems: 'center' }}>
-        <ProgressChart
-          data={currentData}
-          width={screenWidth - 56}  // Giảm width để tạo khoảng cách đều ở 2 bên
-          height={230}
-          strokeWidth={16}
-          radius={32}
-          chartConfig={chartConfig}
-          style={{ borderRadius: 16 }}
-        />
-      </View>
-    </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={{ alignItems: 'center' }}>
+          <LineChart
+            data={currentData}
+            width={screenWidth * 1.2}
+            height={220}
+            chartConfig={chartConfig}
+            bezier
+            style={{ marginVertical: 8, borderRadius: 16 }}
+          />
+        </View>
+      </ScrollView>
+
+      
+    </SafeAreaView>
   );
 }

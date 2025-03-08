@@ -20,13 +20,13 @@ export default function ChartPage() {
         console.log("id:", id);
         const sensorKey = chart?.toLowerCase();
         switch(sensorKey) {
-          case 'wind':
+          case 'coppm':
             return <CoPpmChart id={id} chart={chart} />;
-          case 'water':
+          case 'israining':
             return <IsRainingChart id={id} chart={chart} />;
-          case 'leaf':
+          case 'soilmoisture':
             return <SoilMoistureChart id={id} chart={chart} />;
-          case 'light':
+          case 'lightlevel':
             return <LightLevelChart id={id} chart={chart} />;
           case 'humidity':
             return <HumidityChart id={id} chart={chart} />;

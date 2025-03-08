@@ -11,8 +11,9 @@ type SensorCardProps = {
     slug : string
     value : string | number 
     id : string
+    unit : string
 }
-export default function SensorCard({icon , title, slug, value, id}: SensorCardProps) {
+export default function SensorCard({icon , title, slug, value, id, unit}: SensorCardProps) {
   const router = useRouter();
   const handlePress = () => {
     router.push(`/page/grow/growSlug/${slug}?chart=${encodeURIComponent(slug)}&id=${id}`);
@@ -38,7 +39,7 @@ export default function SensorCard({icon , title, slug, value, id}: SensorCardPr
         }}
     >
       <View className='absolute inset-0 flex justify-center items-center'>
-        <Text className="text-2xl font-bold">{String(value)}</Text>
+        <Text className="text-2xl font-bold">{String(value)} {unit}</Text>
       </View>
       <View className='absolute bottom-2 right-2 items-end'>
         <View>

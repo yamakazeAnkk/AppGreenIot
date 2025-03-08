@@ -3,63 +3,49 @@ import { AntDesign, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export const settings = [
     {
-        title: 'Edit Profile',
+        title: 'Profile',
         icon: AntDesign,
         iconName: 'edit',
     },
-    {
-        title: 'History',
-        icon: FontAwesome5,
-        iconName: 'history',
-    },
-    {
-        title: 'Phone Number',
-        icon: AntDesign,
-        iconName: 'phone',
-    },
-    {
-        title: 'Security',
-        icon: MaterialIcons,
-        iconName: 'security',
-    },
+    
    
 ]
 export const sensor = [
     {
         title: 'Temperature',
         icon: icons.temperature,
-        slug: 'temperature',
+        slug: 'Temperature',
         key: 'Temperature',
     },
     {
         title: 'Humidity',
-        icon: icons.sun,
-        slug: 'humidity',
+        icon: icons.landscape ,
+        slug: 'Humidity',
         key: 'Humidity',
     },
     {
-        title: 'Water',
-        icon: icons.water,
-        slug: 'water',
-        key: 'IsRaining',
-    },
-    {
-        title: 'Wind',
+        title: 'CoPpm',
         icon: icons.wind,
-        slug: 'wind',
+        slug: 'CoPpm',
         key: 'CoPpm',
     },
     {
-        title: 'Light',
+        title: 'Light Level',
         icon: icons.light,
-        slug: 'light',
+        slug: 'LightLevel',
         key: 'LightLevel',
     },
     {
-        title: 'Leaf',
+        title: 'Soil Moisture',
         icon: icons.leaf,
-        slug: 'leaf',
+        slug: 'SoilMoisture',
         key: 'SoilMoisture',
+    },
+    {
+        title: 'Rain',
+        icon: icons.water,
+        slug: 'IsRaining',
+        key: 'IsRaining',
     },
     
 ]

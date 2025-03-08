@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
@@ -33,7 +33,7 @@ const TabsLayout = () => {
             name="dashboard" 
             options={{ 
                 tabBarIcon: ({ focused }) => (
-                    <MaterialIcons name="space-dashboard" size={28} color={focused ? '#7E9351' : 'gray'} />
+                    <AntDesign name="wechat" size={28} color={focused ? '#7E9351' : 'gray'} />
                 )
             }} 
         />

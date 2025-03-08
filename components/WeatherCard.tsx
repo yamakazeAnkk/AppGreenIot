@@ -28,6 +28,7 @@ export function Weather({ city = 'Sydney', className = '' }: WeatherProps) {
   const feelsLike = Math.round(data.main.feels_like);
   const humidity = data.main.humidity;
   const windSpeed = Math.round(data.wind.speed * 3.6); // Convert m/s to km/h
+  const precipitation = data.weather ? data.weather[0].main : "dry";
 
   return (
     <View className={`bg-accent-100 p-4 rounded-3xl mb-8 px-5 py-4 ${className}`}>
@@ -48,7 +49,7 @@ export function Weather({ city = 'Sydney', className = '' }: WeatherProps) {
           <Text className="text-gray-400 text-sm">Feels like</Text>
         </View>
         <View>
-          <Text className="text-black text-lg">--</Text>
+          <Text className="text-black text-lg">{precipitation}</Text>
           <Text className="text-gray-400 text-sm">Precipitation</Text>
         </View>
         <View>

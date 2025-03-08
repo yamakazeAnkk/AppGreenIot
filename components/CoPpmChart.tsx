@@ -1,75 +1,166 @@
-// CoPpmChart.tsx
-import React, { useState } from 'react';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { LineChart } from 'react-native-chart-kit';
+import { FontAwesome5 } from '@expo/vector-icons';
 
-
-interface CoPpmChartProps { 
+interface CoPpmChartProps {
   id: string;
   chart: string;
 }
-export default function CoPpmChart({id, chart}: CoPpmChartProps) {
-  // State lưu chế độ hiển thị: "day" (mặc định) hoặc "month"
-  const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
 
-  // Dữ liệu cho chế độ Day
-  const dayData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        data: [400, 420, 430, 410, 440, 450, 435],
-      },
-    ],
-  };
-
-  // Dữ liệu cho chế độ Month (ví dụ dữ liệu trung bình cho 12 tháng)
-  const monthData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    datasets: [
-      {
-        data: [410, 415, 420, 425, 430, 435, 440, 445, 440, 435, 430, 425],
-      },
-    ],
-  };
-
-
-  const currentData = viewMode === 'day' ? dayData : monthData;
-
- 
-  const colorsDay = ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4'];
-  const colorsMonth = [
-    '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B',
-    '#FFC107', '#FF9800', '#FF5722', '#795548',
-    '#9E9E9E', '#607D8B', '#00BCD4', '#009688'
-  ];
-  
- 
-  const pieData = currentData.labels.map((label, index) => ({
-    name: label,
-    population: currentData.datasets[0].data[index],
-    color: viewMode === 'day'
-      ? colorsDay[index % colorsDay.length]
-      : colorsMonth[index % colorsMonth.length],
-    legendFontColor: '#7F7F7F',
-    legendFontSize: 15,
-  }));
-
+export default function CoPpmChart({ id, chart }: CoPpmChartProps) {
+  const [viewMode, setViewMode] = useState<'day' | 'month' | 'week'>('day');
+  const [dayData, setDayData] = useState<any>(null);
+  const [weekData, setWeekData] = useState<any>(null);
+  const [monthlyData, setMonthlyData] = useState<any>(null);
   const screenWidth = Dimensions.get('window').width;
+  const [selectedDate, setSelectedDate] = useState('2025-02-01');
+
+  useEffect(() => {
+    if (viewMode === 'day') {
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/time/${id}?year=${year}&month=${month}&day=${day}&columnName=CoPpm`)
+        .then(response => response.json())
+        .then(data => {
+          
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setDayData({
+              labels: ["00-03", "03-06", "06-09", "09-12", "12-15", "15-18", "18-21", "21-24"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "day" mode:', data);
+            setDayData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching day data:', error);
+          setDayData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
+
+  useEffect(() => {
+    if (viewMode === 'month') {
+      const [year, month] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/monthlyAverage/${id}?year=${year}&month=${month}&week=1&columnName=CoPpm`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Month Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setMonthlyData({
+              labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "month" mode:', data);
+            setMonthlyData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching month data:', error);
+          setMonthlyData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
+
+  useEffect(() => {
+    if (viewMode === 'week') {
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/weeklyAverage/${id}?year=${year}&month=${month}&day=${day}&columnName=CoPpm`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Week Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setWeekData({
+              labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Invalid data for "week" mode:', data);
+            setWeekData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching week data:', error);
+          setWeekData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
+
+  const currentData = viewMode === 'day' ? dayData : viewMode === 'month' ? monthlyData : weekData;
+
+  const chartConfig = {
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(0, 100, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: { borderRadius: 16 },
+    propsForDots: {
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#019443',
+    },
+  };
+
+  if (!currentData) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
   return (
-    <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-        CoPpm Chart ({viewMode === 'day' ? 'Day View' : 'Month View'})
-      </Text>
+    <SafeAreaView style={{ flex: 1, padding: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            backgroundColor: '#FFE4E1',
+            borderRadius: 16,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 8,
+          }}
+        >
+          <FontAwesome5 name="wind" size={20} color="#019443" />
+        </View>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>CoPpm Chart</Text>
+      </View>
 
-      {/* Toggle Button giữa Day và Month */}
+      <Calendar
+        current={selectedDate}
+        onDayPress={(day: any) => {
+          console.log('Selected day', day.dateString);
+          setSelectedDate(day.dateString);
+        }}
+        markedDates={{
+          [selectedDate]: {
+            selected: true,
+            selectedColor: '#019443',
+          },
+        }}
+        style={{ marginBottom: 16 }}
+      />
+
       <View style={{ flexDirection: 'row', marginBottom: 16 }}>
         <TouchableOpacity
           onPress={() => setViewMode('day')}
           style={{
             paddingVertical: 8,
             paddingHorizontal: 16,
-            backgroundColor: viewMode === 'day' ? '#4A6741' : '#ccc',
+            backgroundColor: viewMode === 'day' ? "#019443" : "#ccc",
             borderRadius: 8,
             marginRight: 8,
           }}
@@ -81,37 +172,40 @@ export default function CoPpmChart({id, chart}: CoPpmChartProps) {
           style={{
             paddingVertical: 8,
             paddingHorizontal: 16,
-            backgroundColor: viewMode === 'month' ? '#4A6741' : '#ccc',
+            backgroundColor: viewMode === 'month' ? "#019443" : "#ccc",
             borderRadius: 8,
+            marginRight: 8,
           }}
         >
           <Text style={{ color: 'white', fontSize: 16 }}>Month</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setViewMode('week')}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            backgroundColor: viewMode === 'week' ? "#019443" : "#ccc",
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 16 }}>Week</Text>
+        </TouchableOpacity>
       </View>
 
-      <PieChart
-        data={pieData}
-        width={screenWidth - 56} 
-        height={180}
-        chartConfig={{
-          backgroundColor: '#ffffff',
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
-          decimalPlaces: 0, 
-          color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: { borderRadius: 16 },
-        }}
-        accessor="population"         // Dùng key "population" để lấy giá trị
-        backgroundColor="transparent"  // Màu nền của PieChart
-        paddingLeft="15"               // Padding bên trái để căn chỉnh
-        absolute                      // Hiển thị giá trị tuyệt đối
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-        
-      />
-    </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={{ alignItems: 'center' }}>
+          <LineChart
+            data={currentData}
+            width={screenWidth * 1.2}
+            height={220}
+            chartConfig={chartConfig}
+            bezier
+            style={{ marginVertical: 8, borderRadius: 16 }}
+          />
+        </View>
+      </ScrollView>
+
+      
+    </SafeAreaView>
   );
 }

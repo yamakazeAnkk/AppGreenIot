@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView, View, Text, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import { LineChart } from 'react-native-chart-kit';
 import { Feather } from '@expo/vector-icons';
 
@@ -8,79 +9,107 @@ interface TemperatureChartProps {
   chart: string;
 }
 
-export default function TemperatureChart({id, chart}: TemperatureChartProps) {
-  const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
-  const [dayData, setDayData] = useState<any>(null); // State to hold the day data
-  const [weekData, setWeekData] = useState<any>(null); // State to hold the week data
+export default function TemperatureChart({ id, chart }: TemperatureChartProps) {
+  const [viewMode, setViewMode] = useState<'day' | 'month' | 'week'>('day'); // Cập nhật viewMode để bao gồm 'week'
+  const [dayData, setDayData] = useState<any>(null);
+  const [weekData, setWeekData] = useState<any>(null);
+  const [monthlyData, setMonthlyData] = useState<any>(null);
   const screenWidth = Dimensions.get('window').width;
 
-  // Fetch data for 'day' view
-  
+  // Sử dụng state để lưu ngày được chọn dưới dạng chuỗi "YYYY-MM-DD"
+  const [selectedDate, setSelectedDate] = useState('2025-02-01');
+
+  // Fetch dữ liệu cho chế độ "day"
   useEffect(() => {
     if (viewMode === 'day') {
-      fetch(`http://0.0.0.0:8080/api/sensor-data/time/${id}?year=2025&month=2&day=1&columnName=Temperature`)
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/time/${id}?year=${year}&month=${month}&day=${day}&columnName=Temperature`)
         .then(response => response.json())
         .then(data => {
-          console.log("Day Data:", data);
-  
-          // Kiểm tra xem dữ liệu có chứa khóa 'data' và mảng không
+    
           if (data && Array.isArray(data.data) && data.data.length > 0) {
             setDayData({
-              labels: [
-                "00-03", "03-06", "06-09", "09-12", 
-                "12-15", "15-18", "18-21", "21-24"
-              ],
+              labels: ["00-03", "03-06", "06-09", "09-12", "12-15", "15-18", "18-21", "21-24"],
               datasets: [{
-                data: data.data, // Sử dụng trực tiếp mảng trong data.data
+                data: data.data,
               }],
             });
           } else {
             console.error('Dữ liệu không hợp lệ cho chế độ "day":', data);
+            setDayData(null);
           }
         })
-        .catch(error => console.error('Error fetching day data:', error));
+        .catch(error => {
+          console.error('Error fetching day data:', error);
+          setDayData(null);
+        });
     }
-  }, [viewMode, id]);
-  
+  }, [viewMode, id, selectedDate]);
 
-  // Fetch data for 'month' view
+  // Fetch dữ liệu cho chế độ "month"
   useEffect(() => {
     if (viewMode === 'month') {
-      fetch(`http://0.0.0.0:8080/api/sensor-data/weeklyAverage/${id}?year=2025&month=2&week=1&columnName=Temperature`)
+      const [year, month] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/monthlyAverage/${id}?year=${year}&month=${month}&week=1&columnName=Temperature`)
         .then(response => response.json())
         .then(data => {
-          console.log("Week Data:", data);
-
-          // Kiểm tra nếu data là mảng và chứa dữ liệu cần thiết
+          console.log("Month Data:", data);
           if (data && Array.isArray(data.data) && data.data.length > 0) {
-            setWeekData({
-              labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+            setMonthlyData({
+              labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
               datasets: [{
-                data: data.data // Giả sử 'average' là khóa dữ liệu
+                data: data.data,
               }],
             });
           } else {
             console.error('Dữ liệu không hợp lệ cho chế độ "month":', data);
+            setMonthlyData(null);
           }
         })
-        .catch(error => console.error('Error fetching week data:', error));
+        .catch(error => {
+          console.error('Error fetching month data:', error);
+          setMonthlyData(null);
+        });
     }
-  }, [viewMode, id]);
+  }, [viewMode, id, selectedDate]);
 
-  // Choose the data based on the view mode
-  const currentData = viewMode === 'day' ? dayData : weekData;
+  // Fetch dữ liệu cho chế độ "week"
+  useEffect(() => {
+    if (viewMode === 'week') {
+      const [year, month, day] = selectedDate.split('-');
+      fetch(`http://0.0.0.0:8080/api/sensor-data/weeklyAverage/${id}?year=${year}&month=${month}&day=${day}&columnName=SoilMoisture`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Week Data:", data);
+          if (data && Array.isArray(data.data) && data.data.length > 0) {
+            setWeekData({
+              labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+              datasets: [{
+                data: data.data,
+              }],
+            });
+          } else {
+            console.error('Dữ liệu không hợp lệ cho chế độ "week":', data);
+            setWeekData(null);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching week data:', error);
+          setWeekData(null);
+        });
+    }
+  }, [viewMode, id, selectedDate]);
 
-  // Chart config using orange-red color
+  const currentData = viewMode === 'day' ? dayData : viewMode === 'month' ? monthlyData : weekData;
+
   const chartConfig = {
     backgroundColor: '#ffffff',
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(255, 69, 0, ${opacity})`, // OrangeRed
+    color: (opacity = 1) => `rgba(255, 69, 0, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
+    style: { borderRadius: 16 },
     propsForDots: {
       r: '6',
       strokeWidth: '2',
@@ -89,11 +118,15 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
   };
 
   if (!currentData) {
-    return <Text>Loading...</Text>; // Show loading text while data is being fetched
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
   }
 
   return (
-    <View style={{ padding: 16 }}>
+    <SafeAreaView style={{ flex: 1, padding: 16 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
         <View
@@ -111,6 +144,22 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
         </View>
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Temperature Chart</Text>
       </View>
+
+      {/* Calendar */}
+      <Calendar
+        current={selectedDate}
+        onDayPress={(day: any) => {
+          console.log('Selected day', day.dateString);
+          setSelectedDate(day.dateString);
+        }}
+        markedDates={{
+          [selectedDate]: {
+            selected: true,
+            selectedColor: '#FF4500',
+          },
+        }}
+        style={{ marginBottom: 16 }}
+      />
 
       {/* Toggle Buttons */}
       <View style={{ flexDirection: 'row', marginBottom: 16 }}>
@@ -133,9 +182,21 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
             paddingHorizontal: 16,
             backgroundColor: viewMode === 'month' ? "#FF4500" : "#ccc",
             borderRadius: 8,
+            marginRight: 8,
           }}
         >
           <Text style={{ color: 'white', fontSize: 16 }}>Month</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setViewMode('week')}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            backgroundColor: viewMode === 'week' ? "#FF4500" : "#ccc",
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 16 }}>Week</Text>
         </TouchableOpacity>
       </View>
 
@@ -144,7 +205,7 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
         <View style={{ alignItems: 'center' }}>
           <LineChart
             data={currentData}
-            width={screenWidth * 1.2} // Increase chart width
+            width={screenWidth * 1.2}
             height={220}
             chartConfig={chartConfig}
             bezier
@@ -153,7 +214,7 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
         </View>
       </ScrollView>
 
-      {/* Additional info */}
+      {/* Additional Info */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
         <View style={{ alignItems: 'center' }}>
           <Text style={{ color: 'gray', fontSize: 12 }}>Average</Text>
@@ -164,6 +225,6 @@ export default function TemperatureChart({id, chart}: TemperatureChartProps) {
           <Text style={{ fontSize: 16, fontWeight: 'bold' }}>23-26°C</Text>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
