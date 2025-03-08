@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { WeatherData } from '@/types/weather';
 
-const API_KEY = '24993bd91b5d55b611fbdb7b7ecc3313';
+const API_KEY = '';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 export function useWeather(city: string = 'Sydney') {
